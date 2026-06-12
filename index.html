@@ -14,6 +14,40 @@
 
         body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; min-height: 100vh; align-items: center; overflow-x: hidden; }
         
+        /* ?? ???? ??? ??????? ???????? ???????? */
+        #mobileBlocker {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f101a;
+            z-index: 99999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        #mobileBlocker .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        #mobileBlocker h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 10px 0;
+        }
+        #mobileBlocker p {
+            color: var(--text-gray);
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* ????? ?????? ??????? ??????? ??? ?????? ????? ??????? */
+        @media (max-width: 768px) {
+            #mobileBlocker { display: flex; }
+        }
+
         .top-info-bar { width: 100%; background: rgba(255,255,255,0.02); padding: 10px 0; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: center; gap: 30px; font-size: 0.95rem; }
         .live-time { color: var(--blue); font-weight: bold; }
 
@@ -74,6 +108,13 @@
 </head>
 <body>
 
+    <!-- ????? ????? ????? ??????? ???????? -->
+    <div id="mobileBlocker">
+        <div class="icon">???</div>
+        <h1>?????? ???? ??? ???? ??????? ???</h1>
+        <p>???? ??? ?????? ?? ???? ????? ?????? ?? ????????.</p>
+    </div>
+
     <div class="top-info-bar">
         <span id="liveDate">--/--/----</span>
         <span id="liveClock" class="live-time">00:00:00</span>
@@ -103,12 +144,14 @@
         <div id="leavesGrid" class="grid"></div>
     </div>
     
+    <!-- ??? TASK ??????? ?????? ????? ????? ???? ???? ??????? ??? ?? ?????? ????? ????? ??????? -->
     <div id="taskSection" class="container">
         <div class="iframe-container">
             <iframe id="taskIframe" src="https://earthlinktel-my.sharepoint.com/personal/rmukhallad_earthlink_iq/_layouts/15/Doc.aspx?sourcedoc={3685d448-406e-4db6-8f86-c1f66fefb961}&action=embedview&wdAllowInteractivity=True&wdHideGridlines=True&wdHideHeaders=True&wdDownloadButton=True"></iframe>
         </div>
     </div>
 
+    <!-- ??? QUALITY REPORT -->
     <div id="qualitySection" class="container">
         <div class="iframe-container">
             <iframe id="sharepointIframe" src="https://earthlinktel-my.sharepoint.com/personal/tkamil_earthlink_iq/_layouts/15/Doc.aspx?sourcedoc={4da0de95-568f-4593-807e-a31ca99ca008}&action=embedview&wdAllowInteractivity=True&ActiveCell='BackOffice'!A1&wdHideGridlines=True&wdHideHeaders=True&wdDownloadButton=True"></iframe>
@@ -134,7 +177,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ?? ?? ??? ??? Zahraa ????? ?? ????? ????????
     const employees = ["Muhammad", "Riyam", "Ibrahem", "Hasan", "Zaynab", "Narjes", "Sajjad", "Shakir", "Abid Allah Najm", "Abid Allah"];
     const lunchTimes = ["01:00", "01:30", "02:00", "02:30", "03:00", "03:20"];
     let lunchData = {}, leavesData = {}, maxCap = 1, selectedEmp = null;
@@ -267,9 +309,17 @@
 
     function setCap(n) { db.ref('maxCap').set(n); }
     
-    // ?? ?? ????? ???? ?????? ????? 246810 ????? ?? ???????
     function adminMode() { if(prompt("Password:") === "246810") document.body.classList.add('admin-mode'); }
     
+    // ?? ??? ????? ??? JavaScript ?????? ?? ??? ??????? ?????? ???? ????
+    function checkDevice() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            document.getElementById('mobileBlocker').style.display = 'flex';
+        }
+    }
+    window.addEventListener('DOMContentLoaded', checkDevice);
+
     setInterval(() => {
         const n = new Date();
         document.getElementById('liveClock').innerText = n.toLocaleTimeString('en-GB');
