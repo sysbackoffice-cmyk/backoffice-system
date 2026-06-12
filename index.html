@@ -14,7 +14,7 @@
 
         body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; min-height: 100vh; align-items: center; overflow-x: hidden; }
         
-        /* ?? ???? ??? ??????? ???????? ???????? */
+        /* 📱 شاشة حجب الهواتف والأجهزة المحمولة */
         #mobileBlocker {
             display: none;
             position: fixed;
@@ -43,7 +43,7 @@
             margin: 0;
         }
 
-        /* ????? ?????? ??????? ??????? ??? ?????? ????? ??????? */
+        /* تفعيل الشاشة الحاجبة برمجياً عند اكتشاف شاشات الهواتف */
         @media (max-width: 768px) {
             #mobileBlocker { display: flex; }
         }
@@ -64,14 +64,14 @@
         .admin-mode .admin-controls { display: block; }
         .admin-btn { background: white; border: none; padding: 6px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; margin: 0 5px; font-size: 0.8rem; }
 
-        /* ????? ??????? ??????? ?? LUNCH ? LEAVES */
+        /* حاوية الصفحات الأصلية لـ LUNCH و LEAVES */
         .container { width: 90%; max-width: 1020px; display: none; padding: 30px 0; margin: 0 auto; flex-direction: column; align-items: center; text-align: center; }
         .container.active { display: flex; }
 
-        /* ????? ????? ???????? ?????? ?????? */
+        /* توسيع صفحات التقارير وجداول الجودة */
         #qualitySection { max-width: 96% !important; width: 96% !important; }
 
-        /* ??? ???? TASK ?????? ????? ????? ??????? ???? ?????? ?????? */
+        /* ضبط صفحة TASK حصرياً لتكون عريضة ومناسبة لحجم الجدول تماماً */
         #taskSection { max-width: 96% !important; width: 96% !important; margin: 0 auto; }
 
         .emp-list-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 35px; width: 100%; }
@@ -96,23 +96,23 @@
         .today-off-section { margin-bottom: 30px; width: 100%; max-width: 650px; background: rgba(255, 159, 67, 0.05); padding: 20px; border-radius: 20px; border: 2px solid rgba(255, 159, 67, 0.3); display: none; box-shadow: 0 10px 40px rgba(255, 159, 67, 0.1); }
         .alert-title { background: linear-gradient(to right, #ff9f43, #ffca28); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; font-size: 1.3rem; letter-spacing: 3px; margin-bottom: 15px; display: block; text-transform: uppercase; }
 
-        /* ????? ??????? ?????? */
+        /* حاوية الجداول العامة */
         .iframe-container { width: 100%; background: #12131e; border-radius: 24px; padding: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); overflow: hidden; box-sizing: border-box; margin-top: 10px; display: flex; justify-content: center; }
         
-        /* ???? ???? ???? ???????? */
+        /* إطار صفحة جودة التقارير */
         #qualitySection .iframe-container iframe { width: 100%; height: 600px; border: none; border-radius: 16px; background: #ffffff; }
 
-        /* ?????? ???? TASK: ???????? ?? ???? ??? ?????? ?????? ?????? ?? ???? ????? ?????? ??????? */
+        /* موازنة صفحة TASK: الارتفاع تم ضبطه لقص الفراغ السفلي تماماً مع بقاء العرض متسعاً ومريحاً */
         #taskSection .iframe-container iframe { width: 100%; height: 340px; border: none; border-radius: 16px; background: #ffffff; }
     </style>
 </head>
 <body>
 
-    <!-- ????? ????? ????? ??????? ???????? -->
+    <!-- واجهة رسالة الحجب للهواتف المحمولة -->
     <div id="mobileBlocker">
-        <div class="icon">???</div>
-        <h1>?????? ???? ??? ???? ??????? ???</h1>
-        <p>???? ??? ?????? ?? ???? ????? ?????? ?? ????????.</p>
+        <div class="icon">🖥️</div>
+        <h1>الموقع يعمل على جهاز الحاسوب فقط</h1>
+        <p>يرجى فتح النظام من شاشة حاسوب لتتمكن من استخدامه.</p>
     </div>
 
     <div class="top-info-bar">
@@ -144,14 +144,14 @@
         <div id="leavesGrid" class="grid"></div>
     </div>
     
-    <!-- ??? TASK ??????? ?????? ????? ????? ???? ???? ??????? ??? ?? ?????? ????? ????? ??????? -->
+    <!-- قسم TASK الموازن حصرياً لراحة العين وعرض كافة الأعمدة دون أي فراغات بيضاء زائدة بالأسفل -->
     <div id="taskSection" class="container">
         <div class="iframe-container">
             <iframe id="taskIframe" src="https://earthlinktel-my.sharepoint.com/personal/rmukhallad_earthlink_iq/_layouts/15/Doc.aspx?sourcedoc={3685d448-406e-4db6-8f86-c1f66fefb961}&action=embedview&wdAllowInteractivity=True&wdHideGridlines=True&wdHideHeaders=True&wdDownloadButton=True"></iframe>
         </div>
     </div>
 
-    <!-- ??? QUALITY REPORT -->
+    <!-- قسم QUALITY REPORT -->
     <div id="qualitySection" class="container">
         <div class="iframe-container">
             <iframe id="sharepointIframe" src="https://earthlinktel-my.sharepoint.com/personal/tkamil_earthlink_iq/_layouts/15/Doc.aspx?sourcedoc={4da0de95-568f-4593-807e-a31ca99ca008}&action=embedview&wdAllowInteractivity=True&ActiveCell='BackOffice'!A1&wdHideGridlines=True&wdHideHeaders=True&wdDownloadButton=True"></iframe>
@@ -311,7 +311,7 @@
     
     function adminMode() { if(prompt("Password:") === "246810") document.body.classList.add('admin-mode'); }
     
-    // ?? ??? ????? ??? JavaScript ?????? ?? ??? ??????? ?????? ???? ????
+    // 🚀 فحص إضافي عبر JavaScript للتأكد من حظر الهواتف الذكية بشكل صارم
     function checkDevice() {
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         if (isMobile) {
