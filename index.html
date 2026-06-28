@@ -9,322 +9,184 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         :root { --bg: #0f101a; --card-bg: rgba(255, 255, 255, 0.03); --blue: #00d2ff; --purple: #a29bfe; --orange: #ff9f43; --danger: #ff4b5c; --green: #55efc4; --text-gray: #94a3b8; }
-        
         * { box-sizing: border-box; }
-
         body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; min-height: 100vh; align-items: center; overflow-x: hidden; }
         
-        /* 📱 شاشة حجب الهواتف والأجهزة المحمولة */
-        #mobileBlocker {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f101a;
-            z-index: 99999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-        #mobileBlocker .icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-        #mobileBlocker h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #fff;
-            margin: 0 0 10px 0;
-        }
-        #mobileBlocker p {
-            color: var(--text-gray);
-            font-size: 1rem;
-            margin: 0;
-        }
-
-        /* تفعيل الشاشة الحاجبة برمجياً عند اكتشاف شاشات الهواتف */
-        @media (max-width: 768px) {
-            #mobileBlocker { display: flex; }
-        }
-
+        .card .user-badge { font-size: 0.9rem !important; padding: 5px 12px !important; margin: 4px !important; display: inline-block; }
+        #mobileBlocker { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f101a; z-index: 99999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        #mobileBlocker .icon { font-size: 4rem; margin-bottom: 20px; }
+        #mobileBlocker h1 { font-size: 1.8rem; font-weight: 800; color: #fff; margin: 0 0 10px 0; }
+        #mobileBlocker p { color: var(--text-gray); font-size: 1rem; margin: 0; }
+        @media (max-width: 768px) { #mobileBlocker { display: flex; } }
         .top-info-bar { width: 100%; background: rgba(255,255,255,0.02); padding: 10px 0; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: center; gap: 30px; font-size: 0.95rem; }
         .live-time { color: var(--blue); font-weight: bold; }
-
         .nav-bar { width: 100%; background: rgba(0,0,0,0.4); padding: 15px 0; display: flex; justify-content: center; gap: 10px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
         .nav-link { padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: 800; color: var(--text-gray); transition: 0.3s; font-size: 0.85rem; }
         .nav-link.active-lunch { background: var(--blue); color: black; }
         .nav-link.active-leaves { background: var(--orange); color: black; }
-        .nav-link.active-task { background: var(--purple); color: black; box-shadow: 0 0 15px rgba(162, 155, 254, 0.4); }
+        .nav-link.active-task { background: white; color: black; }
         .nav-link.active-quality { background: var(--green); color: black; }
-
         .user-badge.already-booked { opacity: 0.3; cursor: not-allowed; background: #444 !important; color: #888 !important; box-shadow: none; border: none; }
-
         .admin-controls { display: none; width: 100%; background: rgba(255, 75, 92, 0.1); padding: 12px 0; text-align: center; border-bottom: 1px solid var(--danger); }
         .admin-mode .admin-controls { display: block; }
         .admin-btn { background: white; border: none; padding: 6px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; margin: 0 5px; font-size: 0.8rem; }
-
-        /* حاوية الصفحات الأصلية لـ LUNCH و LEAVES */
         .container { width: 90%; max-width: 1020px; display: none; padding: 30px 0; margin: 0 auto; flex-direction: column; align-items: center; text-align: center; }
         .container.active { display: flex; }
-
-        /* توسيع صفحات التقارير وجداول الجودة */
         #qualitySection { max-width: 96% !important; width: 96% !important; }
-
-        /* ضبط صفحة TASK حصرياً لتكون عريضة ومناسبة لحجم الجدول تماماً */
-        #taskSection { max-width: 96% !important; width: 96% !important; margin: 0 auto; }
-
         .emp-list-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 35px; width: 100%; }
         .user-badge { background: #fff; color: #000; padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 2px solid transparent; }
-        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; width: 100%; justify-content: center; }
-
         .card { background: var(--card-bg); border-radius: 20px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; min-height: 180px; align-items: center; justify-content: space-between; transition: 0.3s; }
         .card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
-
         .reserve-btn { border: none; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.85rem; transition: 0.3s; width: 90%; margin-top: 15px; }
         .btn-lunch { background: linear-gradient(135deg, var(--blue), #00a8cc); color: black; }
         .btn-leaves { background: linear-gradient(135deg, var(--orange), #e67e22); color: black; }
-
         .footer-signature { margin-top: auto; padding: 40px 0; width: 100%; text-align: center; border-top: 1px solid rgba(255,255,255,0.03); }
         .signature-name { font-size: 1.6rem; font-weight: 900; letter-spacing: 8px; font-family: 'Times New Roman', serif; color: #fff; }
-        .signature-sub { font-size: 0.7rem; color: var(--text-gray); margin-top: 5px; letter-spacing: 2px; }
-
         .remove-x { color: var(--danger); margin-right: 8px; cursor: pointer; display: none; font-weight: bold; }
         .admin-mode .remove-x { display: inline; }
-
-        .today-off-section { margin-bottom: 30px; width: 100%; max-width: 650px; background: rgba(255, 159, 67, 0.05); padding: 20px; border-radius: 20px; border: 2px solid rgba(255, 159, 67, 0.3); display: none; box-shadow: 0 10px 40px rgba(255, 159, 67, 0.1); }
-        .alert-title { background: linear-gradient(to right, #ff9f43, #ffca28); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; font-size: 1.3rem; letter-spacing: 3px; margin-bottom: 15px; display: block; text-transform: uppercase; }
-
-        /* حاوية الجداول العامة */
-        .iframe-container { width: 100%; background: #12131e; border-radius: 24px; padding: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); overflow: hidden; box-sizing: border-box; margin-top: 10px; display: flex; justify-content: center; }
         
-        /* إطار صفحة جودة التقارير */
-        #qualitySection .iframe-container iframe { width: 100%; height: 600px; border: none; border-radius: 16px; background: #ffffff; }
+        .today-off-section { margin-bottom: 30px; width: 100%; max-width: 650px; background: rgba(255, 75, 92, 0.05); padding: 20px; border-radius: 20px; border: 2px solid var(--danger); display: none; box-shadow: 0 10px 40px rgba(255, 75, 92, 0.2); }
+        .alert-title { background: linear-gradient(to right, #ff4b5c, #ff7675); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; font-size: 1.3rem; letter-spacing: 3px; margin-bottom: 15px; display: block; text-transform: uppercase; }
+        #todayLeavesBadges .user-badge { border: 1px solid var(--danger) !important; background: #fff !important; color: var(--danger) !important; }
 
-        /* موازنة صفحة TASK: الارتفاع تم ضبطه لقص الفراغ السفلي تماماً مع بقاء العرض متسعاً ومريحاً */
-        #taskSection .iframe-container iframe { width: 100%; height: 340px; border: none; border-radius: 16px; background: #ffffff; }
+        .iframe-container { width: 100%; background: #12131e; border-radius: 24px; padding: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); overflow: hidden; box-sizing: border-box; margin-top: 10px; display: flex; justify-content: center; }
+        #qualitySection .iframe-container iframe { width: 100%; height: 600px; border: none; border-radius: 16px; background: #ffffff; }
     </style>
 </head>
 <body>
-
-    <!-- واجهة رسالة الحجب للهواتف المحمولة -->
-    <div id="mobileBlocker">
-        <div class="icon">🖥️</div>
-        <h1>الموقع يعمل على جهاز الحاسوب فقط</h1>
-        <p>يرجى فتح النظام من شاشة حاسوب لتتمكن من استخدامه.</p>
-    </div>
-
-    <div class="top-info-bar">
-        <span id="liveDate">--/--/----</span>
-        <span id="liveClock" class="live-time">00:00:00</span>
-    </div>
-
+    <div id="mobileBlocker"><div class="icon">???</div><h1>?????? ???? ??? ??????? ???</h1><p>???? ??? ?????? ?? ???? ?????.</p></div>
+    <div class="top-info-bar"><span id="liveDate">--/--/----</span><span id="liveClock" class="live-time">00:00:00</span></div>
+    
     <nav class="nav-bar">
         <div id="btnLunch" class="nav-link active-lunch" onclick="tab('lunch')">LUNCH</div>
         <div id="btnLeaves" class="nav-link" onclick="tab('leaves')">LEAVES</div>
         <div id="btnTask" class="nav-link" onclick="tab('task')">TASK</div>
         <div id="btnQuality" class="nav-link" onclick="tab('quality')">QUALITY REPORT</div>
     </nav>
-
+    
     <div class="admin-controls">
-        <button class="admin-btn" onclick="setCap(1)">SEAT 1</button>
-        <button class="admin-btn" onclick="setCap(2)">SEAT 2</button>
+        <input type="text" id="timeInput" placeholder="Time (01:00)">
+        <input type="number" id="capInput" placeholder="Capacity">
+        <button class="admin-btn" onclick="updateTimeCap()">SET CAPACITY</button>
         <button class="admin-btn" onclick="document.body.classList.remove('admin-mode')">EXIT ADMIN</button>
     </div>
 
     <div id="lunchSection" class="container active"><div id="lunchEmpList" class="emp-list-container"></div><div id="lunchGrid" class="grid"></div></div>
-    
     <div id="leavesSection" class="container">
         <div id="todayLeavesAlert" class="today-off-section">
             <span class="alert-title">LEAVES TODAY</span>
-            <div id="todayLeavesBadges" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
+            <div id="todayLeavesBadges" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;"></div>
         </div>
         <div id="leavesEmpList" class="emp-list-container"></div>
         <div id="leavesGrid" class="grid"></div>
     </div>
-    
-    <!-- قسم TASK الموازن حصرياً لراحة العين وعرض كافة الأعمدة دون أي فراغات بيضاء زائدة بالأسفل -->
     <div id="taskSection" class="container">
-        <div class="iframe-container">
-            <iframe id="taskIframe" src="https://earthlinktel-my.sharepoint.com/personal/rmukhallad_earthlink_iq/_layouts/15/Doc.aspx?sourcedoc={3685d448-406e-4db6-8f86-c1f66fefb961}&action=embedview&wdAllowInteractivity=True&wdHideGridlines=True&wdHideHeaders=True&wdDownloadButton=True"></iframe>
+        <div style="width: 100%; background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08);">
+            <div id="task-table-data"></div>
         </div>
     </div>
-
-    <!-- قسم QUALITY REPORT -->
-    <div id="qualitySection" class="container">
-        <div class="iframe-container">
-            <iframe id="sharepointIframe" src="https://earthlinktel-my.sharepoint.com/personal/tkamil_earthlink_iq/_layouts/15/Doc.aspx?sourcedoc={4da0de95-568f-4593-807e-a31ca99ca008}&action=embedview&wdAllowInteractivity=True&ActiveCell='BackOffice'!A1&wdHideGridlines=True&wdHideHeaders=True&wdDownloadButton=True"></iframe>
-        </div>
-    </div>
-
-    <footer class="footer-signature">
-        <div class="signature-name">SHAKIR AMMAR</div>
-        <div class="signature-sub">MANAGEMENT SYSTEM PRO</div>
-        <div onclick="adminMode()" style="opacity:0.02; cursor:pointer; font-size: 0.6rem; margin-top: 15px;">SYSTEM ADMIN</div>
-    </footer>
-
-<script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAK7BESJWRaFk021ZNcUT2Lx4Qi2Tc0GRI",
-      authDomain: "managementsystembackoffice.firebaseapp.com",
-      databaseURL: "https://managementsystembackoffice-default-rtdb.firebaseio.com",
-      projectId: "managementsystembackoffice",
-      storageBucket: "managementsystembackoffice.firebasestorage.app",
-      messagingSenderId: "1099425828111",
-      appId: "1:1099425828111:web:44651d657afd9ba337c27a"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const employees = ["Muhammad", "Riyam", "Ibrahem", "Hasan", "Zaynab", "Narjes", "Sajjad", "Shakir", "Abid Allah Najm", "Abid Allah"];
-    const lunchTimes = ["01:00", "01:30", "02:00", "02:30", "03:00", "03:20"];
-    let lunchData = {}, leavesData = {}, maxCap = 1, selectedEmp = null;
-
-    db.ref('/').on('value', (snap) => {
-        const d = snap.val() || {};
-        lunchData = d.lunchData || {}; 
-        leavesData = d.leavesData || {}; 
-        maxCap = d.maxCap || 1;
-        render(); 
-    });
-
-    function tab(t) {
-        selectedEmp = null;
-        document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(l => l.className = 'nav-link');
-        document.getElementById(t+'Section').classList.add('active');
-        document.getElementById('btn'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active-'+t);
-        render();
-    }
-
-    function formatDateKey(dateObj) {
-        return dateObj.getFullYear() + '-' + (dateObj.getMonth() + 1) + '-' + dateObj.getDate();
-    }
-
-    function forceResetCheck() {
-        const now = new Date();
-        const dateKey = now.toLocaleDateString('en-CA');
-        const hour = now.getHours();
-        db.ref('lastResetDate').get().then((snapshot) => {
-            if (snapshot.val() !== dateKey && hour >= 8) {
-                db.ref('lunchData').set({});
-                db.ref('lastResetDate').set(dateKey);
-            }
-        });
-    }
-    forceResetCheck();
-
-    function render() {
-        const activeContainer = document.querySelector('.container.active');
-        if(!activeContainer || activeContainer.id === 'taskSection' || activeContainer.id === 'qualitySection') return;
-        const activeTab = activeContainer.id.replace('Section', '');
+    <div id="qualitySection" class="container"><div class="iframe-container"><iframe id="sharepointIframe" src="https://earthlinktel-my.sharepoint.com/personal/tkamil_earthlink_iq/_layouts/15/Doc.aspx?sourcedoc={4da0de95-568f-4593-807e-a31ca99ca008}&action=embedview&wdAllowInteractivity=True&ActiveCell='BackOffice'!A1&wdHideGridlines=True&wdHideHeaders=True&wdDownloadButton=True"></iframe></div></div>
+    
+    <footer class="footer-signature"><div class="signature-name">SHAKIR AMMAR</div><div class="signature-sub">MANAGEMENT SYSTEM PRO</div><div onclick="adminMode()" style="opacity:0.02; cursor:pointer; font-size:0.6rem; margin-top:15px;">SYSTEM ADMIN</div></footer>
+    
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyAK7BESJWRaFk021ZNcUT2Lx4Qi2Tc0GRI", databaseURL: "https://managementsystembackoffice-default-rtdb.firebaseio.com", projectId: "managementsystembackoffice" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const employees = ["Muhammad", "Ibrahem", "Hasan", "Zaynab", "Narjes", "Sajjad", "Shakir", "Abid Allah Najm", "Abid Allah"];
+        const lunchTimes = ["01:00", "01:20", "02:00", "02:40", "03:20"];
+        let lunchData = {}, leavesData = {}, caps = {}, selectedEmp = null;
+        db.ref('/').on('value', (snap) => { const d = snap.val() || {}; lunchData = d.lunchData || {}; leavesData = d.leavesData || {}; caps = d.caps || {}; render(); });
         
-        let bookedUsers = [];
-        if(activeTab === 'lunch') {
-            for(let time in lunchData) {
-                if(Array.isArray(lunchData[time])) bookedUsers = bookedUsers.concat(lunchData[time]);
-            }
+        function updateTimeCap() { const t = document.getElementById('timeInput').value; const c = parseInt(document.getElementById('capInput').value); if(t && !isNaN(c)) db.ref('caps/'+t.replace(':','-')).set(c); }
+        
+        function tab(t) { 
+            selectedEmp = null; 
+            document.querySelectorAll('.container').forEach(c => c.classList.remove('active')); 
+            document.querySelectorAll('.nav-link').forEach(l => l.className = 'nav-link'); 
+            document.getElementById(t+'Section').classList.add('active'); 
+            document.getElementById('btn'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active-'+t); 
+            if(t === 'task') loadTask();
+            render(); 
         }
-
-        if(activeTab === 'leaves') {
-            const alertBox = document.getElementById('todayLeavesAlert');
-            const badgeContainer = document.getElementById('todayLeavesBadges');
-            const todayKey = formatDateKey(new Date());
+        
+        function formatDateKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+        
+        function render() {
+            const activeTab = document.querySelector('.container.active').id.replace('Section', '');
             
-            let todayOffs = Array.isArray(leavesData[todayKey]) ? leavesData[todayKey] : [];
-            
-            badgeContainer.innerHTML = '';
-            if(todayOffs.length > 0) {
-                alertBox.style.display = 'block';
-                todayOffs.forEach(name => {
-                    const b = document.createElement('div');
-                    b.className = "user-badge";
-                    b.style.cssText = "background:var(--danger); color:white; border:none; font-size:0.85rem; padding:8px 20px; box-shadow: 0 4px 15px rgba(255, 75, 92, 0.3);";
-                    b.innerText = name;
-                    badgeContainer.appendChild(b);
-                });
-            } else {
-                alertBox.style.display = 'none';
-            }
-        }
-
-        const listDiv = document.getElementById(activeTab + 'EmpList');
-        listDiv.innerHTML = '';
-        employees.forEach(name => {
-            const div = document.createElement('div');
-            div.className = 'user-badge';
-            if(activeTab === 'lunch' && bookedUsers.includes(name)) div.classList.add('already-booked');
-            if(selectedEmp === name) { 
-                div.style.background = activeTab==='lunch'?'var(--blue)':'var(--orange)'; 
-                div.style.color = 'black'; 
-            }
-            div.innerText = name; 
-            div.onclick = () => { 
-                if(!div.classList.contains('already-booked')) {
-                    selectedEmp = name; 
-                    render(); 
+            if(activeTab === 'leaves') {
+                const todayKey = formatDateKey(new Date());
+                const todayLeaves = leavesData[todayKey] || [];
+                const alertSection = document.getElementById('todayLeavesAlert');
+                const alertBadges = document.getElementById('todayLeavesBadges');
+                
+                if(todayLeaves.length > 0) {
+                    alertSection.style.display = 'block';
+                    alertBadges.innerHTML = todayLeaves.map(n => `<span class="user-badge" style="cursor:default">${n}</span>`).join('');
+                } else {
+                    alertSection.style.display = 'none';
                 }
-            };
-            listDiv.appendChild(div);
-        });
+            }
 
-        const grid = document.getElementById(activeTab + 'Grid');
-        grid.innerHTML = '';
+            if(activeTab === 'lunch' || activeTab === 'leaves') {
+                const listDiv = document.getElementById(activeTab + 'EmpList'); listDiv.innerHTML = '';
+                const bookedLunch = activeTab === 'lunch' ? Object.values(lunchData).flat() : [];
+                employees.forEach(n => { const div = document.createElement('div'); div.className = 'user-badge' + ((activeTab === 'lunch' && bookedLunch.includes(n)) ? ' already-booked' : ''); if(selectedEmp === n) div.style.background = activeTab==='lunch'?'var(--blue)':'var(--orange)'; div.innerText = n; div.onclick = () => { if(activeTab !== 'lunch' || !bookedLunch.includes(n)) { selectedEmp = n; render(); } }; listDiv.appendChild(div); });
+                const grid = document.getElementById(activeTab + 'Grid'); grid.innerHTML = '';
+                if(activeTab === 'lunch') {
+                    lunchTimes.forEach(t => { const u = lunchData[t] || []; const max = caps[t.replace(':','-')] || 1; const card = document.createElement('div'); card.className = 'card'; card.innerHTML = `<h3>${t}</h3><small>Seats: ${max - u.length}</small><div>${u.map(n=>`<div class="user-badge"><span class="remove-x" onclick="cancelL('${t}','${n}')">x</span>${n}</div>`).join('')}</div><button class="reserve-btn btn-lunch" ${!selectedEmp || (max - u.length) <= 0 ?'disabled':''} onclick="bookL('${t}')">RESERVE</button>`; grid.appendChild(card); });
+                } else {
+                    getNext10Days().forEach(d => { const u = leavesData[d.id] || []; const card = document.createElement('div'); card.className = 'card'; card.innerHTML = `<h3>${d.dayName}</h3><small>${d.dateStr}</small><div>${u.map(n=>`<div class="user-badge"><span class="remove-x" onclick="cancelV('${d.id}','${n}')">x</span>${n}</div>`).join('')}</div><button class="reserve-btn btn-leaves" ${!selectedEmp ? 'disabled':''} onclick="bookV('${d.id}')">REQUEST</button>`; grid.appendChild(card); });
+                }
+            }
+        }
 
-        if(activeTab === 'lunch') {
-            lunchTimes.forEach(t => {
-                const card = document.createElement('div'); card.className = 'card';
-                const usersArr = Array.isArray(lunchData[t]) ? lunchData[t] : [];
-                const usersHtml = usersArr.filter(n => n).map(n => `<div class="user-badge" style="font-size:0.8rem; padding:4px 10px; margin:2px;"><span class="remove-x" onclick="cancelL('${t}','${n}')">x</span>${n}</div>`).join('');
-                const left = maxCap - usersArr.length;
-                card.innerHTML = `<div><h3>${t}</h3><small style="color:var(--text-gray)">Available Seats: ${left}</small></div><div style="margin:10px 0; display:flex; flex-wrap:wrap; justify-content:center;">${usersHtml}</div><button class="reserve-btn btn-lunch" ${!selectedEmp || left <= 0 ?'disabled':''} onclick="bookL('${t}')">RESERVE SEAT</button>`;
-                grid.appendChild(card);
+        function loadTask() {
+            const script = document.createElement('script');
+            script.src = "https://docs.google.com/spreadsheets/d/109X_p3jqrhK2cpl0MZXx7kzpOlWHyeUrUFMCdlmpGnM/gviz/tq?tqx=responseHandler:processTask";
+            document.body.appendChild(script);
+        }
+
+window.processTask = function(res) {
+    if (!res || !res.table || !res.table.rows) return;
+    const rows = res.table.rows;
+    const colorMap = { "Abid Allah Najm": "#e0e0e0", "Riyam": "#ff007f", "Zainab": "#bf00ff", "Abid Allah": "#d2691e", "Hasan": "#32cd32", "Sajjad": "#ff0055", "Shakir": "#00ffcc", "Ibrahem": "#ff9900", "Muhammad": "#ccff00", "Narjes": "#0088ff" };
+    const container = document.getElementById('task-table-data');
+    container.parentElement.style.cssText = "border: none !important; background: transparent !important; padding: 0 !important; box-shadow: none !important;";
+    let html = '<table style="width: 100%; border-collapse: separate; border-spacing: 0 8px; font-family: sans-serif; border: none !important;">';
+    rows.forEach(r => {
+        html += `<tr onmouseover="this.querySelectorAll('span').forEach(s => s.style.backgroundColor='rgba(255,255,255,0.08)');" onmouseout="this.querySelectorAll('span').forEach(s => s.style.backgroundColor='rgba(255,255,255,0.03)');">`;
+        if (r.c) {
+            r.c.forEach(cell => {
+                let val = cell ? (cell.f || cell.v || "") : "";
+                if (colorMap[val]) {
+                    const color = colorMap[val];
+                    html += `<td style="padding: 0 6px; text-align: center; border: none !important;"><span style="display: flex; align-items: center; justify-content: center; width: 120px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.03); color:${color}; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent; margin: 0 auto; text-shadow: 0 0 5px rgba(0,0,0,0.5);" onmouseover="this.style.filter='brightness(1.6) drop-shadow(0 0 5px ${color})'; this.style.borderColor='${color}';" onmouseout="this.style.filter='brightness(1) drop-shadow(none)'; this.style.borderColor='transparent';">${val}</span></td>`;
+                } else {
+                    html += `<td style="padding: 0 8px; color: #718096; font-size: 0.85rem; text-align: center; border: none !important;">${val}</td>`;
+                }
             });
-        } else if(activeTab === 'leaves') {
-            getNext10Days().forEach(d => {
-                const card = document.createElement('div'); card.className = 'card';
-                const usersArr = Array.isArray(leavesData[d.id]) ? leavesData[d.id] : [];
-                const usersHtml = usersArr.filter(n => n).map(n => `<div class="user-badge" style="font-size:0.85rem; padding:6px 12px; margin:3px;"><span class="remove-x" onclick="cancelV('${d.id}','${n}')">x</span>${n}</div>`).join('');
-                card.innerHTML = `<div><h3 style="margin:0">${d.dayName}</h3><small style="color:var(--orange); font-weight:bold;">${d.dateStr}</small></div><div style="margin:15px 0; display:flex; flex-wrap:wrap; justify-content:center;">${usersHtml}</div><button class="reserve-btn btn-leaves" ${!selectedEmp ? 'disabled':''} onclick="bookV('${d.id}')">REQUEST OFF</button>`;
-                grid.appendChild(card);
-            });
         }
-    }
+        html += '</tr>';
+    });
+    html += '</table>';
+    container.innerHTML = html;
+};
 
-    function bookL(t) { if(!selectedEmp) return; let l = Array.isArray(lunchData[t]) ? lunchData[t] : []; l.push(selectedEmp); db.ref('lunchData/'+t).set(l); selectedEmp = null; }
-    function bookV(id) { if(!selectedEmp) return; let l = Array.isArray(leavesData[id]) ? leavesData[id] : []; if(!l.includes(selectedEmp)) { l.push(selectedEmp); db.ref('leavesData/'+id).set(l); } selectedEmp = null; }
-    function cancelL(t,n) { if(Array.isArray(lunchData[t])) db.ref('lunchData/'+t).set(lunchData[t].filter(x=>x!==n)); }
-    function cancelV(id,n) { if(Array.isArray(leavesData[id])) db.ref('leavesData/'+id).set(leavesData[id].filter(x=>x!==n)); }
-
-    function getNext10Days() {
-        let days=[];
-        for(let i=1; i<=10; i++){
-            let d = new Date(); d.setDate(d.getDate()+i);
-            let idKey = formatDateKey(d);
-            days.push({ id: idKey, dateStr: d.toLocaleDateString('en-GB',{day:'numeric', month:'short'}), dayName: d.toLocaleDateString('en-GB',{weekday:'long'}) });
-        }
-        return days;
-    }
-
-    function setCap(n) { db.ref('maxCap').set(n); }
-    
-    function adminMode() { if(prompt("Password:") === "246810") document.body.classList.add('admin-mode'); }
-    
-    // 🚀 فحص إضافي عبر JavaScript للتأكد من حظر الهواتف الذكية بشكل صارم
-    function checkDevice() {
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        if (isMobile) {
-            document.getElementById('mobileBlocker').style.display = 'flex';
-        }
-    }
-    window.addEventListener('DOMContentLoaded', checkDevice);
-
-    setInterval(() => {
-        const n = new Date();
-        document.getElementById('liveClock').innerText = n.toLocaleTimeString('en-GB');
-        document.getElementById('liveDate').innerText = n.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
-    }, 1000);
-</script>
+        function bookL(t) { let l = lunchData[t] || []; l.push(selectedEmp); db.ref('lunchData/'+t).set(l); }
+        function bookV(id) { let l = leavesData[id] || []; if(!l.includes(selectedEmp)) { l.push(selectedEmp); db.ref('leavesData/'+id).set(l); } }
+        function cancelL(t,n) { db.ref('lunchData/'+t).set(lunchData[t].filter(x=>x!==n)); }
+        function cancelV(id,n) { db.ref('leavesData/'+id).set(leavesData[id].filter(x=>x!==n)); }
+        function getNext10Days() { let dts=[]; for(let i=1; i<=10; i++){ let d=new Date(); d.setDate(d.getDate()+i); dts.push({id:formatDateKey(d), dateStr:d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}), dayName:d.toLocaleDateString('en-GB',{weekday:'long'})}); } return dts; }
+        function adminMode() { if(prompt("Password:") === "246810") document.body.classList.add('admin-mode'); }
+        setInterval(() => { 
+            const now = new Date();
+            document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-GB'); 
+            document.getElementById('liveDate').innerText = now.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'}); 
+            if (now.getHours() === 8 && now.getMinutes() === 0 && now.getSeconds() === 0) { db.ref('lunchData').set({}); }
+        }, 1000);
+    </script>
 </body>
 </html>
