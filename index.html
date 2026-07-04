@@ -144,10 +144,15 @@
         }
 
         function loadTask() {
-            const script = document.createElement('script');
-            script.src = "https://docs.google.com/spreadsheets/d/109X_p3jqrhK2cpl0MZXx7kzpOlWHyeUrUFMCdlmpGnM/gviz/tq?tqx=responseHandler:processTask";
-            document.body.appendChild(script);
-        }
+    const oldScript = document.getElementById('jsonp-script');
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement('script');
+    script.id = 'jsonp-script';
+    // ????? headers=0 ??? ?? ???? ?????? ???? ???????
+    script.src = "https://docs.google.com/spreadsheets/d/109X_p3jqrhK2cpl0MZXx7kzpOlWHyeUrUFMCdlmpGnM/gviz/tq?tqx=responseHandler:processTask&headers=0";
+    document.body.appendChild(script);
+}
 
 window.processTask = function(res) {
     if (!res || !res.table || !res.table.rows) return;
@@ -155,17 +160,24 @@ window.processTask = function(res) {
     const colorMap = { "Abid Allah Najm": "#e0e0e0", "Riyam": "#ff007f", "Zainab": "#bf00ff", "Abid Allah": "#d2691e", "Hasan": "#32cd32", "Sajjad": "#ff0055", "Shakir": "#00ffcc", "Ibrahem": "#ff9900", "Muhammad": "#ccff00", "Narjes": "#0088ff" };
     const container = document.getElementById('task-table-data');
     container.parentElement.style.cssText = "border: none !important; background: transparent !important; padding: 0 !important; box-shadow: none !important;";
+    
     let html = '<table style="width: 100%; border-collapse: separate; border-spacing: 0 8px; font-family: sans-serif; border: none !important;">';
+    
     rows.forEach(r => {
         html += `<tr onmouseover="this.querySelectorAll('span').forEach(s => s.style.backgroundColor='rgba(255,255,255,0.08)');" onmouseout="this.querySelectorAll('span').forEach(s => s.style.backgroundColor='rgba(255,255,255,0.03)');">`;
+        
         if (r.c) {
             r.c.forEach(cell => {
                 let val = cell ? (cell.f || cell.v || "") : "";
                 if (colorMap[val]) {
                     const color = colorMap[val];
-                    html += `<td style="padding: 0 6px; text-align: center; border: none !important;"><span style="display: flex; align-items: center; justify-content: center; width: 120px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.03); color:${color}; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent; margin: 0 auto; text-shadow: 0 0 5px rgba(0,0,0,0.5);" onmouseover="this.style.filter='brightness(1.6) drop-shadow(0 0 5px ${color})'; this.style.borderColor='${color}';" onmouseout="this.style.filter='brightness(1) drop-shadow(none)'; this.style.borderColor='transparent';">${val}</span></td>`;
+                    // التعديل هنا: استخدام min-width و padding أفقي مرن
+                    html += `<td style="padding: 0 6px; text-align: center; border: none !important;">
+                        <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 120px; padding: 0 10px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.03); color:${color}; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent; margin: 0 auto; text-shadow: 0 0 5px rgba(0,0,0,0.5); white-space: nowrap;" 
+                        onmouseover="this.style.filter='brightness(1.6) drop-shadow(0 0 5px ${color})'; this.style.borderColor='${color}';" 
+                        onmouseout="this.style.filter='brightness(1) drop-shadow(none)'; this.style.borderColor='transparent';">${val}</span></td>`;
                 } else {
-                    html += `<td style="padding: 0 8px; color: #718096; font-size: 0.85rem; text-align: center; border: none !important;">${val}</td>`;
+                    html += `<td style="padding: 0 8px; color: #718096; font-size: 0.85rem; text-align: center; border: none !important; white-space: nowrap;">${val}</td>`;
                 }
             });
         }
@@ -174,6 +186,19 @@ window.processTask = function(res) {
     html += '</table>';
     container.innerHTML = html;
 };
+// ???? ?????? ?????? ??????
+function formatCell(val, colorMap) {
+    if (colorMap[val]) {
+        const color = colorMap[val];
+        return `<td style="padding: 0 6px; text-align: center; border: none !important;">
+            <span style="display: flex; align-items: center; justify-content: center; width: 100px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.03); color:${color}; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent; margin: 0 auto; text-shadow: 0 0 5px rgba(0,0,0,0.5);" 
+            onmouseover="this.style.filter='brightness(1.6) drop-shadow(0 0 5px ${color})'; this.style.borderColor='${color}';" 
+            onmouseout="this.style.filter='brightness(1) drop-shadow(none)'; this.style.borderColor='transparent';">
+            ${val}</span></td>`;
+    } else {
+        return `<td style="padding: 0 8px; color: #718096; font-size: 0.8rem; text-align: center; border: none !important;">${val}</td>`;
+    }
+}
 
         function bookL(t) { let l = lunchData[t] || []; l.push(selectedEmp); db.ref('lunchData/'+t).set(l); }
         function bookV(id) { let l = leavesData[id] || []; if(!l.includes(selectedEmp)) { l.push(selectedEmp); db.ref('leavesData/'+id).set(l); } }
