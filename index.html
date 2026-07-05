@@ -194,12 +194,16 @@
             document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-GB'); 
             document.getElementById('liveDate').innerText = now.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'}); 
             
-            // التعديل: تصفير بيانات الغداء يومياً بعد الساعة 8:00 صباحاً
-            const lastReset = localStorage.getItem('lastResetDate');
-            const today = now.toDateString();
-            if (now.getHours() >= 8 && lastReset !== today) {
-                db.ref('lunchData').set({});
-                localStorage.setItem('lastResetDate', today);
+            // ???????: ???????? ??? Firebase ???? ????? ??? ?????
+            if (now.getHours() >= 8) {
+                const today = now.toDateString();
+                db.ref('lastResetDate').once('value').then((snapshot) => {
+                    const lastReset = snapshot.val();
+                    if (lastReset !== today) {
+                        db.ref('lunchData').set({});
+                        db.ref('lastResetDate').set(today);
+                    }
+                });
             }
         }, 1000);
     </script>
