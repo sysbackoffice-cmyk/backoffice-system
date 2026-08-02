@@ -55,7 +55,7 @@
     </style>
 </head>
 <body>
-    <div id="mobileBlocker"><div class="icon">???</div><h1>?????? ???? ??? ??????? ???</h1><p>???? ??? ?????? ?? ???? ?????.</p></div>
+    <div id="mobileBlocker"><div class="icon">??</div><h1>???? ??? ?????? ?? ???? ?????</h1><p>??? ?????? ???? ????? ??? ????? ?????????.</p></div>
     <div class="top-info-bar"><span id="liveDate">--/--/----</span><span id="liveClock" class="live-time">00:00:00</span></div>
     
     <nav class="nav-bar">
@@ -138,7 +138,21 @@
                 if(activeTab === 'lunch') {
                     lunchTimes.forEach(t => { const u = lunchData[t] || []; const max = caps[t.replace(':','-')] || 1; const card = document.createElement('div'); card.className = 'card'; card.innerHTML = `<h3>${t}</h3><small>Seats: ${max - u.length}</small><div>${u.map(n=>`<div class="user-badge"><span class="remove-x" onclick="cancelL('${t}','${n}')">x</span>${n}</div>`).join('')}</div><button class="reserve-btn btn-lunch" ${!selectedEmp || (max - u.length) <= 0 ?'disabled':''} onclick="bookL('${t}')">RESERVE</button>`; grid.appendChild(card); });
                 } else {
-                    getNext10Days().forEach(d => { const u = leavesData[d.id] || []; const card = document.createElement('div'); card.className = 'card'; card.innerHTML = `<h3>${d.dayName}</h3><small>${d.dateStr}</small><div>${u.map(n=>`<div class="user-badge"><span class="remove-x" onclick="cancelV('${d.id}','${n}')">x</span>${n}</div>`).join('')}</div><button class="reserve-btn btn-leaves" ${!selectedEmp ? 'disabled':''} onclick="bookV('${d.id}')">REQUEST</button>`; grid.appendChild(card); });
+                    getNext10Days().forEach(d => { 
+                        const u = leavesData[d.id] || []; 
+                        const isBooked = u.length > 0;
+                        const card = document.createElement('div'); 
+                        card.className = 'card'; 
+                        card.innerHTML = `<h3>${d.dayName}</h3><small>${d.dateStr}</small>` +
+                            `<div>${u.map(n=>`<div class="user-badge"><span class="remove-x" onclick="cancelV('${d.id}','${n}')">x</span>${n}</div>`).join('')}</div>` +
+                            `<button class="reserve-btn btn-leaves" ${!selectedEmp || isBooked ? 'disabled':''}>${isBooked ? 'BOOKED' : 'REQUEST'}</button>`; 
+                        
+                        const btn = card.querySelector('button');
+                        if (!isBooked && selectedEmp) {
+                            btn.onclick = () => bookV(d.id);
+                        }
+                        grid.appendChild(card); 
+                    });
                 }
             }
         }
@@ -183,7 +197,13 @@
         };
 
         function bookL(t) { let l = lunchData[t] || []; l.push(selectedEmp); db.ref('lunchData/'+t).set(l); }
-        function bookV(id) { let l = leavesData[id] || []; if(!l.includes(selectedEmp)) { l.push(selectedEmp); db.ref('leavesData/'+id).set(l); } }
+        function bookV(id) { 
+            if(!selectedEmp) return;
+            const currentBookings = leavesData[id] || [];
+            if (currentBookings.length === 0) {
+                db.ref('leavesData/'+id).set([selectedEmp]); 
+            }
+        }
         function cancelL(t,n) { db.ref('lunchData/'+t).set(lunchData[t].filter(x=>x!==n)); }
         function cancelV(id,n) { db.ref('leavesData/'+id).set(leavesData[id].filter(x=>x!==n)); }
         function getNext10Days() { let dts=[]; for(let i=1; i<=10; i++){ let d=new Date(); d.setDate(d.getDate()+i); dts.push({id:formatDateKey(d), dateStr:d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}), dayName:d.toLocaleDateString('en-GB',{weekday:'long'})}); } return dts; }
@@ -194,10 +214,9 @@
             document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-GB'); 
             document.getElementById('liveDate').innerText = now.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'}); 
             
-            // ???????: ???????? ??? Firebase ???? ????? ??? ?????
             if (now.getHours() >= 8) {
                 const today = now.toDateString();
-                db.ref('lastResetDate').once('value').then((snapshot) => {
+                db.ref('lastResetDate').once('value').text ? null : db.ref('lastResetDate').once('value').then((snapshot) => {
                     const lastReset = snapshot.val();
                     if (lastReset !== today) {
                         db.ref('lunchData').set({});
