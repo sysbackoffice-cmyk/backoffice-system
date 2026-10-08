@@ -55,7 +55,7 @@
     </style>
 </head>
 <body>
-    <div id="mobileBlocker"><div class="icon">??</div><h1>?? ???? ??? ??? ?????? ?? ???? ??????</h1><p>???? ??????? ???? ????? ??? ????? ?? .</p></div>
+    <div id="mobileBlocker"><div class="icon">??</div><h1>???? ??? ?????? ?? ???? ?????</h1><p>??? ?????? ???? ????? ??? ????? ?????????.</p></div>
     <div class="top-info-bar"><span id="liveDate">--/--/----</span><span id="liveClock" class="live-time">00:00:00</span></div>
     
     <nav class="nav-bar">
@@ -94,7 +94,7 @@
         const firebaseConfig = { apiKey: "AIzaSyAK7BESJWRaFk021ZNcUT2Lx4Qi2Tc0GRI", databaseURL: "https://managementsystembackoffice-default-rtdb.firebaseio.com", projectId: "managementsystembackoffice" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const employees = ["Muhammad", "Ibrahem", "Hasan", "Zaynab", "Narjes", "Sajjad", "Shakir", "Abid Allah Najm", "Abid Allah"];
+        const employees = ["Muhammad", "Ibrahem", "Kamal", "Abid Allah Mukhlis", "Zaynab", "Hayder", "Narjes", "Sajjad", "Shakir", "Abid Allah Najm", "Abid Allah"];
         const lunchTimes = ["01:00", "01:20", "02:00", "02:40", "03:20"];
         let lunchData = {}, leavesData = {}, caps = {}, selectedEmp = null;
         db.ref('/').on('value', (snap) => { const d = snap.val() || {}; lunchData = d.lunchData || {}; leavesData = d.leavesData || {}; caps = d.caps || {}; render(); });
